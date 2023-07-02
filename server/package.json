@@ -1,0 +1,23 @@
+{
+  "name": "@react-trpc-chat-app/server",
+  "version": "10.32.0",
+  "private": true,
+  "scripts": {
+    "dev": "ts-node index.ts"
+  },
+  "dependencies": {
+    "@trpc/server": "^10.29.1",
+    "zod": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^18.16.16",
+    "@typescript-eslint/eslint-plugin": "^5.60.1",
+    "@typescript-eslint/parser": "^5.60.1",
+    "eslint": "^8.2.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-airbnb-typescript": "^17.0.0",
+    "eslint-plugin-import": "^2.25.2",
+    "nodemon": "^2.0.22",
+    "ts-node": "^10.9.1"
+  }
+}

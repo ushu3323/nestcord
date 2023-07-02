@@ -1,0 +1,26 @@
+{
+  "name": "react-trpc-chat-app",
+  "private": true,
+  "version": "10.32.0",
+  "root": true,
+  "scripts": {
+    "dev:server": "nodemon ./server/index.ts",
+    "dev:client": "vite --port 5173 --clearScreen false ./client",
+    "dev": "concurrently -n SERVER,CLIENT -c bgBlue.bold,bgMagenta.bold npm:dev:server npm:dev:client",
+    "lint": "eslint --ext \".js,.ts,.tsx\" --report-unused-disable-directives */*.ts",
+    "test-dev": "start-server-and-test 'nodemon ./server/index.ts' 3000 'vite --port 5173'",
+    "test-start": "start-server-and-test 'node dist/server' 3000 'node dist/client'"
+  },
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "devDependencies": {
+    "@types/node": "^18.16.16",
+    "concurrently": "^8.2.0",
+    "eslint": "^8.2.0",
+    "nodemon": "^2.0.22",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.6"
+  }
+}
