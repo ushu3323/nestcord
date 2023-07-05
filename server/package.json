@@ -3,7 +3,7 @@
   "version": "10.32.0",
   "private": true,
   "scripts": {
-    "dev": "ts-node index.ts"
+    "dev": "nodemon index.ts"
   },
   "dependencies": {
     "@trpc/server": "^10.29.1",
