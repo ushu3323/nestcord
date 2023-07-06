@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "target": "esnext",
+    "useDefineForClassFields": true,
     "module": "NodeNext",
     "moduleResolution": "node",
     "esModuleInterop": true,
@@ -8,7 +9,6 @@
     "outDir": "dist"
   },
   "include": [
-    "server",
-    "client"
+    "src",
   ]
 }

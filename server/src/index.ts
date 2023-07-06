@@ -1,6 +1,6 @@
 import { createHTTPServer } from '@trpc/server/adapters/standalone';
-import { router } from './src/trpc';
-import { usersRouter } from './src/routers';
+import { router } from './trpc';
+import { usersRouter } from './routers';
 
 const appRouter = router({
   users: usersRouter,
