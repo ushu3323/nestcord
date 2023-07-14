@@ -15,7 +15,7 @@ export const usersRouter = router({
     return user;
   }),
   create: publicProcedure
-    .input(z.object({ name: z.string() }))
+    .input(z.object({ username: z.string(), email: z.string(), password: z.string() }))
     .mutation(async (opts) => {
       const { input } = opts;
       // Create a new user in the database
