@@ -1,23 +1,11 @@
-type User = { id: string; username: string; email: string; password: string };
+import { PrismaClient, Prisma } from '@prisma/client';
 
-// Imaginary database
-const users: User[] = [
-  {
-    id: '1',
-    username: 'admin',
-    email: 'admin@server.com',
-    password: '123456',
-  },
-];
+type LogLevel = Prisma.LogLevel;
 
-export const db = {
-  user: {
-    findMany: async () => users,
-    findById: async (id: string) => users.find((user) => user.id === id),
-    create: async (data: { username: string; email: string; password: string }) => {
-      const user = { id: String(users.length + 1), ...data };
-      users.push(user);
-      return user;
-    },
-  },
-};
+const logLevels: LogLevel[] = process.env.NODE_ENV === 'production'
+  ? ['error']
+  : ['warn', 'error'];
+
+export const client = new PrismaClient({
+  log: logLevels,
+});

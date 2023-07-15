@@ -3,9 +3,15 @@
   "version": "10.32.0",
   "private": true,
   "scripts": {
-    "dev": "ts-node-dev --respawn --watch src/ --rs src/index.ts"
+    "dev": "ts-node-dev --respawn --watch src/ --rs src/index.ts",
+    "db:init": "prisma generate",
+    "db:sync": "prisma db push"
+  },
+  "prisma": {
+    "seed": "ts-node-dev prisma/seed.ts"
   },
   "dependencies": {
+    "@prisma/client": "^5.0.0",
     "@trpc/server": "^10.29.1",
     "cors": "^2.8.5",
     "zod": "^3.0.0"
@@ -19,6 +25,7 @@
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-airbnb-typescript": "^17.0.0",
     "eslint-plugin-import": "^2.25.2",
+    "prisma": "^5.0.0",
     "ts-node-dev": "^2.0.0"
   }
 }

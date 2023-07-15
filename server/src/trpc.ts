@@ -1,8 +1,11 @@
 import { initTRPC } from '@trpc/server';
+import { createContext } from './context';
 
-const t = initTRPC.create({
-  errorFormatter: ({ shape }) => shape,
-});
+const t = initTRPC
+  .context<typeof createContext>()
+  .create({
+    errorFormatter: ({ shape }) => shape,
+  });
 
 export const { router } = t;
 
