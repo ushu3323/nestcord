@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 import { client } from '../src/db';
+import { encryptPassword } from '../src/utils/hash';
 
 async function main() {
   const alpha = await client.user.upsert({
@@ -8,7 +9,7 @@ async function main() {
     create: {
       username: 'alpha',
       email: 'alpha@server.net',
-      password: 'alphaPassword',
+      password: await encryptPassword('alphaPassword'),
     },
   });
 
@@ -18,7 +19,7 @@ async function main() {
     create: {
       username: 'beta',
       email: 'beta@server.net',
-      password: 'betaPassword',
+      password: await encryptPassword('betaPassword'),
     },
   });
 
