@@ -15,11 +15,11 @@ export const usersRouter = router({
     });
     return user;
   }),
-  create: publicProcedure
+  register: publicProcedure
     .input(z.object({ username: z.string(), email: z.string(), password: z.string() }))
     .mutation(async ({ input, ctx }) => {
       const { db } = ctx;
-      const user = await db.user.create({ data: input });
+      const user = await db.user.register(input);
       return user;
     }),
 });
