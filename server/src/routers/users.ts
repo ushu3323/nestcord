@@ -16,7 +16,11 @@ export const usersRouter = router({
     return user;
   }),
   register: publicProcedure
-    .input(z.object({ username: z.string(), email: z.string(), password: z.string() }))
+    .input(z.object({
+      username: z.string().min(6),
+      email: z.string().email(),
+      password: z.string().min(6),
+    }))
     .mutation(async ({ input, ctx }) => {
       const { db } = ctx;
       const user = await db.user.register(input);
