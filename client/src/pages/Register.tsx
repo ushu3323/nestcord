@@ -2,6 +2,7 @@
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { InputText } from 'primereact/inputtext';
+import { Password } from 'primereact/password';
 import { useRef } from 'react';
 import { Toast } from 'primereact/toast';
 import { useFormik } from 'formik';
@@ -85,13 +86,19 @@ export default function Register() {
             </div>
             <div>
               <span className="p-float-label">
-                <InputText
+                <Password
                   id="password"
                   name="password"
                   type="password"
-                  className={classNames('w-full', { 'p-invalid': isFormFieldInvalid('username') })}
+                  className={classNames({ 'p-invalid': isFormFieldInvalid('username') })}
+                  pt={{
+                    root: { className: 'w-full' },
+                    input: { className: 'w-full' },
+                  }}
                   value={formik.values.password}
                   onChange={formik.handleChange}
+                  feedback={false}
+                  toggleMask
                 />
                 <label htmlFor="password">Password</label>
               </span>
