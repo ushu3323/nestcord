@@ -6,19 +6,6 @@ import { comparePassword } from '../utils/hash';
 import { getConfig } from '../config';
 
 export const usersRouter = router({
-  list: publicProcedure.query(async ({ ctx }) => {
-    const { db } = ctx;
-    const users = await db.user.findMany({ select: { id: true, email: true, username: true } });
-    return users;
-  }),
-  byId: publicProcedure.input(z.string()).query(async ({ input, ctx }) => {
-    const { db } = ctx;
-    const user = await db.user.findUnique({
-      where: { id: input },
-      select: { id: true, email: true, username: true },
-    });
-    return user;
-  }),
   register: publicProcedure
     .input(z.object({
       username: z.string().min(6),
