@@ -1,7 +1,9 @@
 import { z } from 'zod';
+import jwt from 'jsonwebtoken';
 import { TRPCError } from '@trpc/server';
 import { publicProcedure, router } from '../trpc';
 import { comparePassword } from '../utils/hash';
+import { getConfig } from '../config';
 
 export const usersRouter = router({
   list: publicProcedure.query(async ({ ctx }) => {
@@ -35,6 +37,7 @@ export const usersRouter = router({
     }))
     .mutation(async ({ input, ctx }) => {
       const { db } = ctx;
+      const config = getConfig();
       const user = await db.user.findUnique({
         where: { username: input.username },
       });
@@ -46,11 +49,8 @@ export const usersRouter = router({
         });
       }
 
-      const { id, username, email } = user;
-      return {
-        id,
-        email,
-        username,
-      };
+      const { id, username } = user;
+      const token = jwt.sign({ id, username }, config.jwt.tokenKey, config.jwt.defaultSignOptions);
+      return { token };
     }),
 });

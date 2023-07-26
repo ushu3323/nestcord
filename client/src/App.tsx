@@ -6,12 +6,19 @@ import { trpc } from './utils/trpc';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Chat from './pages/Chat';
 
 const queryClient = new QueryClient();
 const trpcClient = trpc.createClient({
   links: [
     httpBatchLink({
       url: import.meta.env.VITE_TRPC_HTTP_URL,
+      headers() {
+        const token = localStorage.getItem('token');
+        return {
+          Authorization: token ? `Bearer ${token}` : '',
+        };
+      },
     }),
   ],
 });
@@ -23,6 +30,7 @@ export default function App() {
           <Route index element={<Home />} />
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
+          <Route path="chat" element={<Chat />} />
         </Routes>
       </QueryClientProvider>
     </trpc.Provider>

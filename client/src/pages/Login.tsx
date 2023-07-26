@@ -7,55 +7,43 @@ import { useRef } from 'react';
 import { useFormik } from 'formik';
 import { Button } from 'primereact/button';
 import { Password } from 'primereact/password';
-import { Utils, trpc } from '../utils/trpc';
+import { Navigate, useNavigate } from 'react-router-dom';
+import { ProgressSpinner } from 'primereact/progressspinner';
+import useUser from '../hooks/useUser';
 
 export default function Login() {
-  const registerMutation = trpc.users.auth.useMutation();
-  type MutationInput = Exclude<typeof registerMutation.variables, undefined>;
-
+  const {
+    user, login, isLoading, isAuthenticating,
+  } = useUser();
+  const navigate = useNavigate();
   const toast = useRef<Toast>(null);
   const formik = useFormik({
     initialValues: { username: '', password: '' },
     validateOnChange: false,
-    onSubmit: (values) => registerMutation.mutate(values, {
-      onSuccess: (result) => toast.current?.show({
-        severity: 'success',
-        summary: `Hello ${result.username}`,
-        detail: (
-          <div>
-            This is your email:
-            {result.email}
-            <p>
-              <br />
-              <em>
-                BTW your id is
-                {' '}
-                {result.id}
-              </em>
-
-            </p>
-          </div>
-        ),
-      }),
-      onError(opts) {
-        const zodError: Utils.InferFormattedError<MutationInput> | null = (
-          opts.data?.zodError ?? null
-        );
-
-        if (zodError) {
-          /* eslint-disable no-underscore-dangle */
-          const { username, password } = zodError;
-          formik.setErrors({
+    onSubmit: (values) => {
+      login(values, ({ success, error }) => {
+        if (success) return navigate('/chat');
+        if (error.input) {
+        /* eslint-disable no-underscore-dangle */
+          const { username, password } = error.input;
+          return formik.setErrors({
             username: username?._errors.join('\n') ?? '',
             password: password?._errors.join('\n') ?? '',
           });
-          /* eslint-enable no-underscore-dangle */
-          return;
+        /* eslint-enable no-underscore-dangle */
         }
-        toast.current?.show({ severity: 'error', summary: 'Error', detail: opts.message });
-      },
-    }),
+        return toast.current?.show({ severity: 'error', summary: 'Error', detail: error.message });
+      });
+    },
   });
+
+  if (isLoading) {
+    return <ProgressSpinner />;
+  }
+
+  if (user) {
+    return <Navigate to="/chat" />;
+  }
 
   type FieldNames = keyof typeof formik.initialValues;
 
@@ -106,7 +94,7 @@ export default function Login() {
               </span>
               {getFormErrorMessage('password')}
             </div>
-            <Button type="submit" label="Join" className="w-full mt-5" loading={registerMutation.isLoading} />
+            <Button type="submit" label="Join" className="w-full mt-5" loading={isAuthenticating} />
           </div>
         </form>
       </Card>
