@@ -1,49 +1,44 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
+import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { InputText } from 'primereact/inputtext';
-import { Toast } from 'primereact/toast';
-import { classNames } from 'primereact/utils';
-import { useRef } from 'react';
-import { useFormik } from 'formik';
-import { Button } from 'primereact/button';
 import { Password } from 'primereact/password';
-import { Navigate, useNavigate } from 'react-router-dom';
-import { ProgressSpinner } from 'primereact/progressspinner';
-import useUser from '../hooks/useUser';
+import { useRef } from 'react';
+import { Toast } from 'primereact/toast';
+import { useFormik } from 'formik';
+import { classNames } from 'primereact/utils';
+import { trpc, Utils } from '../utils/trpc';
 
-export default function Login() {
-  const {
-    user, login, isLoading, isAuthenticating,
-  } = useUser();
-  const navigate = useNavigate();
+export default function Register() {
+  const registerMutation = trpc.users.register.useMutation();
+  type MutationInput = Exclude<typeof registerMutation.variables, undefined>;
+
   const toast = useRef<Toast>(null);
   const formik = useFormik({
-    initialValues: { username: '', password: '' },
+    initialValues: { username: '', email: '', password: '' },
     validateOnChange: false,
-    onSubmit: (values) => {
-      login(values, ({ success, error }) => {
-        if (success) return navigate('/chat');
-        if (error.input) {
-        /* eslint-disable no-underscore-dangle */
-          const { username, password } = error.input;
-          return formik.setErrors({
+    onSubmit: (values) => registerMutation.mutate(values, {
+      onSuccess: () => toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Registered succesfully!' }),
+      onError(opts) {
+        const zodError: Utils.InferFormattedError<MutationInput> | null = (
+          opts.data?.zodError ?? null
+        );
+
+        if (zodError) {
+          /* eslint-disable no-underscore-dangle */
+          const { username, email, password } = zodError;
+          formik.setErrors({
             username: username?._errors.join('\n') ?? '',
+            email: email?._errors.join('\n') ?? '',
             password: password?._errors.join('\n') ?? '',
           });
-        /* eslint-enable no-underscore-dangle */
+          /* eslint-enable no-underscore-dangle */
+          return;
         }
-        return toast.current?.show({ severity: 'error', summary: 'Error', detail: error.message });
-      });
-    },
+        toast.current?.show({ severity: 'error', summary: 'Error', detail: opts.message });
+      },
+    }),
   });
-
-  if (isLoading) {
-    return <ProgressSpinner />;
-  }
-
-  if (user) {
-    return <Navigate to="/chat" />;
-  }
 
   type FieldNames = keyof typeof formik.initialValues;
 
@@ -59,7 +54,7 @@ export default function Login() {
     <div className="h-screen flex justify-center items-center">
       <Toast ref={toast} />
       <Card className="w-96">
-        <h1 className="text-3xl font-bold text-center mb-10">Log in</h1>
+        <h1 className="text-3xl font-bold text-center mb-10">User register</h1>
         <form onSubmit={formik.handleSubmit} className="w-full px-5">
           <div className="flex flex-col gap-2">
             <div>
@@ -77,12 +72,27 @@ export default function Login() {
             </div>
             <div>
               <span className="p-float-label">
+                <InputText
+                  id="email"
+                  name="email"
+                  type="email"
+                  className={classNames('w-full', { 'p-invalid': isFormFieldInvalid('email') })}
+                  value={formik.values.email}
+                  onChange={formik.handleChange}
+                />
+                <label htmlFor="email">E-mail</label>
+              </span>
+              {getFormErrorMessage('email')}
+            </div>
+            <div>
+              <span className="p-float-label">
                 <Password
                   id="password"
                   name="password"
                   type="password"
-                  className={classNames('w-full', { 'p-invalid': isFormFieldInvalid('username') })}
+                  className={classNames({ 'p-invalid': isFormFieldInvalid('username') })}
                   pt={{
+                    root: { className: 'w-full' },
                     input: { className: 'w-full' },
                   }}
                   value={formik.values.password}
@@ -94,7 +104,7 @@ export default function Login() {
               </span>
               {getFormErrorMessage('password')}
             </div>
-            <Button type="submit" label="Join" className="w-full mt-5" loading={isAuthenticating} />
+            <Button type="submit" label="Register" className="w-full mt-5" loading={registerMutation.isLoading} />
           </div>
         </form>
       </Card>
