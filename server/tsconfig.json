@@ -9,7 +9,7 @@
     "outDir": "dist"
   },
   "include": [
-    "src",
-    "prisma"
+    "prisma",
+    "src/**/*.ts"
   ]
 }
