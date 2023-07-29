@@ -1,17 +1,23 @@
 /* eslint-disable no-console */
 import cors from 'cors';
-import { createHTTPServer } from '@trpc/server/adapters/standalone';
+import express from 'express';
+import * as trpcExpress from '@trpc/server/adapters/express';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { applyActionCode } from 'firebase/auth';
 import { appRouter } from './routers';
 import { createContext } from './context';
 import { client } from './db';
 import { getConfig, setupConfig } from './config';
+import firebaseadmin from './firebase/admin';
+import clientApp from './firebase/client';
 
 export type AppRouter = typeof appRouter;
 
 async function bootstrap() {
   setupConfig();
   const config = getConfig();
-
+  firebaseadmin.initialize();
+  clientApp.initialize();
   console.log('[tRPC] Connecting to database...');
   try {
     await client.$connect();
@@ -21,14 +27,33 @@ async function bootstrap() {
     throw err;
   }
 
-  const server = createHTTPServer({
-    middleware: cors(),
-    router: appRouter,
-    createContext,
+  const app = express();
+  app.use(cors());
+  app.use(
+    '/trpc',
+    trpcExpress.createExpressMiddleware({
+      router: appRouter,
+      createContext,
+    }),
+  );
+  app.get('/verify-email', async (req, res, next) => {
+    const query = req.query as any;
+    try {
+      await applyActionCode(clientApp.auth, query.oobCode);
+    } catch (err) {
+      next(err);
+    }
+    res.json({ query: req.query });
   });
-  server.server
-    // eslint-disable-next-line no-console
-    .listen(config.port, () => console.log('[tRPC] HTTP server listening at port:', config.port))
+  app.get('/currentUser', (req, res) => {
+    res.json({
+      user: clientApp.auth.currentUser,
+    });
+  });
+  app
+    .listen(config.port, () => {
+      console.log('[tRPC] HTTP server listening at port:', config.port);
+    })
     .on('close', () => { client.$disconnect(); });
 }
 

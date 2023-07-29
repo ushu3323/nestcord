@@ -18,7 +18,9 @@ export default function Register() {
     initialValues: { username: '', email: '', password: '' },
     validateOnChange: false,
     onSubmit: (values) => registerMutation.mutate(values, {
-      onSuccess: () => toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Registered succesfully!' }),
+      onSuccess: () => toast.current?.show({
+        severity: 'info', summary: 'User registered', detail: 'Check your inbox!', life: 0,
+      }),
       onError(opts) {
         const zodError: Utils.InferFormattedError<MutationInput> | null = (
           opts.data?.zodError ?? null

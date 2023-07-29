@@ -8,6 +8,7 @@ const processEnviromentSchema = z.object({
   PORT: z.coerce.number().positive().default(3000),
   JWT_KEY: z.string().nonempty(),
   JWT_REFRESH_KEY: z.string().nonempty(),
+  FIREBASE_API_KEY: z.string().nonempty(),
 });
 
 type AppConfiguration = {
@@ -16,6 +17,9 @@ type AppConfiguration = {
     tokenKey: string,
     refreshTokenKey: string,
     defaultSignOptions: SignOptions
+  },
+  firebase: {
+    apiKey: string,
   }
 };
 
@@ -42,6 +46,9 @@ export function setupConfig() {
       defaultSignOptions: {
         expiresIn: '1h',
       },
+    },
+    firebase: {
+      apiKey: env.FIREBASE_API_KEY,
     },
   };
 }
